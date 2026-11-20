@@ -1,0 +1,38 @@
+[
+  {
+    "key": "day_pass",
+    "label": "Day pass tickets (SevenRooms)",
+    "url": "https://sevn.ly/xvKcpSJX",
+    "note": "The SUNKSSD Lumi Beach day-pass experience page."
+  },
+  {
+    "key": "camping",
+    "label": "Camping tickets (SevenRooms)",
+    "url": "https://sevn.ly/xshc0Y2s",
+    "note": "Separate ticket from the day pass - not bundled. See PR-10."
+  },
+  {
+    "key": "rooms",
+    "label": "Room bookings (IPMS247)",
+    "url": "https://live.ipms247.com/booking/book-rooms-ummalquwainbeachhotel",
+    "note": "Umm Al Quwain Beach Hotel room booking, separate from both ticket types."
+  },
+  {
+    "key": "email",
+    "label": "Email",
+    "url": "mailto:info@sunkssd.io",
+    "note": "Public contact address, also the EventSeries organizer contact in site JSON-LD."
+  },
+  {
+    "key": "instagram",
+    "label": "Instagram",
+    "url": "https://www.instagram.com/sunkssd.io/",
+    "note": "Never scraped or messaged - link only, per the hard rule."
+  },
+  {
+    "key": "whatsapp",
+    "label": "WhatsApp",
+    "url": "https://wa.me/971521141519",
+    "note": "Public WhatsApp number shown on sunkssd.io. Never messaged, per the hard rule."
+  }
+]

@@ -1,0 +1,89 @@
+# Eleven policy rules. Each one is evaluated on every draft, and gets a row on the
+# run timeline whether it fires or not. The boolean logic for each rule lives in
+# app/policy.py; this file is the human-readable metadata the UI and README reference.
+#
+# kind: "block" means a fire is a policy violation (escalate / repair-once).
+# kind: "note"  means a fire appends a non-blocking note (PR-09 only).
+
+rules:
+  - id: PR-01
+    name: no_currency
+    kind: block
+    severity: critical
+    description: >
+      Reject a currency symbol or ISO code adjacent to digits (AED 150, $50, 150 dirhams).
+      Must not fire on ordinary digits near ordinary words (noon to 11pm, Nov 14, group of 20).
+
+  - id: PR-02
+    name: no_availability_claim
+    kind: block
+    severity: critical
+    description: >
+      Reject "available", "sold out", "spots left", "fully booked", "we have space".
+
+  - id: PR-03
+    name: no_unsourced_affirmation
+    kind: block
+    severity: high
+    description: >
+      An affirmative answer to a yes/no question needs at least one citation.
+      Validated against content's structured {sentence, cites[]} output, not regex.
+
+  - id: PR-04
+    name: citation_exists
+    kind: block
+    severity: high
+    description: Every cited section id must exist in the chunks corpus.
+
+  - id: PR-05
+    name: claim_coverage
+    kind: block
+    severity: high
+    description: >
+      Every factual sentence carries a citation (same structured basis as PR-03;
+      a sentence tagged non_factual is exempt).
+
+  - id: PR-06
+    name: no_invented_policy
+    kind: block
+    severity: critical
+    description: >
+      Deny-list of policy verbs (refund, cancel, re-entry, age limit, alcohol)
+      unless the sentence carries a citation.
+
+  - id: PR-07
+    name: link_whitelist
+    kind: block
+    severity: high
+    description: Any URL in the draft must appear in official_links.
+
+  - id: PR-08
+    name: group_quote_must_escalate
+    kind: block
+    severity: critical
+    description: Intent group_quote always escalates and never answers with numbers.
+
+  - id: PR-09
+    name: stale_corpus
+    kind: note
+    severity: low
+    description: >
+      If the corpus's max accessed_at is older than CORPUS_STALE_DAYS (default 45),
+      append a freshness note. Non-blocking.
+
+  - id: PR-10
+    name: camping_not_bundled
+    kind: block
+    severity: high
+    description: >
+      The corpus has two separate ticket links and no bundling statement. A
+      camping-included question must answer with both links and a confirm-with-the-team
+      line, never a bare yes or no.
+
+  - id: PR-11
+    name: date_outside_published_weekends
+    kind: block
+    severity: medium
+    description: >
+      If the resolved event date falls outside the published weekends in the corpus,
+      state the published list and escalate rather than guessing.

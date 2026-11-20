@@ -1,0 +1,27 @@
+# Secrets never upload: production env vars are set with `vercel env add`.
+# `vercel link` also writes an OIDC token to .env.local.
+.env
+.env.*
+!.env.example
+
+# local tooling, tests and docs - not needed by the function
+.venv
+venv
+.pytest_cache
+**/__pycache__
+**/*.pyc
+.cursor
+tests
+tests;C
+migrations;C
+scripts
+PITCH_DECK_BRIEF.md
+SYSTEM_EXPLAINER.md
+TODOS.md
+Dockerfile
+docker-compose.yml
+data/corpus/*.html
+
+# pyproject.toml only holds pytest config; with it present Vercel ignores
+# requirements.txt and installs nothing.
+pyproject.toml

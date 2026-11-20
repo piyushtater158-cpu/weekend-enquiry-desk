@@ -1,0 +1,962 @@
+<!DOCTYPE html>
+<html lang="en" data-build="rest-v1">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Weekend Enquiry Desk</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --background: oklch(16.4% 0 0);
+    --foreground: oklch(95.1% .013 70);
+    --secondary: oklch(23% .012 70);
+    --muted: oklch(25% .012 70);
+    --muted-foreground: oklch(73% .014 70);
+    --border: oklch(95.1% .013 70 / .18);
+    --card: oklch(21% .013 70);
+    --primary: oklch(68.2% .214 38.5);
+    --primary-foreground: oklch(16.4% 0 0);
+    --ink: oklch(16.4% 0 0);
+    --accent: oklch(88% .043 63 / .16);
+    --coral: oklch(73.5% .161 33);
+    --amber: oklch(83.5% .16 75);
+    --lumi-cream: oklch(96.5% .02 85);
+    --sunset-gradient: linear-gradient(120deg, var(--coral), var(--amber));
+    --ok: oklch(80% .16 145);
+    --err: oklch(62% .22 25);
+    --warn: var(--amber);
+    --radius-sm: .25rem;
+    --radius-xl: .75rem;
+  }
+  * { box-sizing: border-box; }
+  body {
+    font-family: "Inter", sans-serif;
+    background: var(--background);
+    color: var(--foreground);
+    margin: 0;
+    padding: 0 0 4rem;
+  }
+  main { max-width: 1140px; margin: 0 auto; padding: 0 2rem; }
+  h1, h3, h4 { font-family: "Space Grotesk", sans-serif; font-weight: 700; letter-spacing: 0; margin: 0; }
+  h3 { font-size: 0.95rem; }
+  h4 { font-size: 0.82rem; text-transform: uppercase; letter-spacing: 1.5px; margin: 1rem 0 0.5rem; color: var(--muted-foreground); }
+  a { color: var(--amber); }
+  h2 {
+    font-family: "Space Grotesk", sans-serif;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin: 2.25rem 0 0.9rem;
+    color: var(--muted-foreground);
+  }
+  .section-head { display: flex; align-items: center; justify-content: space-between; gap: .75rem; flex-wrap: wrap; }
+  .section-head h2 { margin: 2.25rem 0 0.9rem; }
+  header.desk-header {
+    position: sticky; top: 0; z-index: 10;
+    background: oklch(16.4% 0 0 / .92);
+    backdrop-filter: blur(6px);
+    border-bottom: 1px solid var(--border);
+    padding: 1.1rem 2rem 0;
+  }
+  .header-row { max-width: 1140px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; padding-bottom: 0.9rem; }
+  .wordmark { font-family: "Space Grotesk", sans-serif; font-size: 1.3rem; font-weight: 700; text-transform: uppercase; letter-spacing: -0.01em; }
+  .wordmark .spark { background: var(--sunset-gradient); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+  .crm-panel { display: inline-flex; align-items: center; gap: .55rem; font-size: .78rem; padding: .4rem .7rem; border: 1px solid var(--border); border-radius: 999px; background: var(--card); flex-wrap: wrap; }
+  .crm-dot { width: .5rem; height: .5rem; border-radius: 50%; display: inline-block; flex: none; }
+  .crm-dot.on { background: var(--ok); box-shadow: 0 0 0 3px oklch(80% .16 145 / .18); }
+  .crm-dot.off { background: var(--muted-foreground); }
+  .live-badge {
+    font-family: "Space Grotesk", sans-serif;
+    font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px;
+    padding: 0.2rem 0.55rem; border-radius: 0.3rem;
+    background: color-mix(in oklch, var(--primary) 16%, transparent);
+    border: 1px solid var(--primary); color: var(--foreground);
+  }
+  .live-badge.off { background: var(--muted); border-color: var(--border); color: var(--muted-foreground); }
+  .marquee {
+    width: 100vw; margin-left: calc(50% - 50vw); height: 46px;
+    background: var(--primary); color: var(--ink); overflow: hidden; display: flex; align-items: center;
+  }
+  .marquee-track { display: flex; width: max-content; animation: wed-marquee 40s linear infinite; }
+  .marquee-track span {
+    font-family: "Space Grotesk", sans-serif; font-size: 16px; font-weight: 600;
+    letter-spacing: 1px; text-transform: uppercase; white-space: nowrap; padding-right: 35px;
+  }
+  .marquee-track b { font-weight: 700; }
+  @media (prefers-reduced-motion: reduce) { .marquee-track { animation: none; } }
+  @keyframes wed-marquee { to { transform: translateX(-50%); } }
+  section { margin-bottom: 1.5rem; }
+  .panel { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-xl); padding: 1.25rem 1.5rem; }
+  select, button, input, textarea {
+    font-family: Inter, sans-serif; font-size: 0.88rem; padding: 0.5rem 0.75rem;
+    border-radius: var(--radius-sm); border: 1px solid var(--border);
+    background: var(--secondary); color: var(--foreground);
+  }
+  select:focus, button:focus, input:focus, textarea:focus { outline: 2px solid var(--primary); outline-offset: 1px; }
+  textarea { width: 100%; resize: vertical; font-family: Inter, sans-serif; }
+  button { cursor: pointer; font-weight: 600; transition: opacity .15s; }
+  button:disabled { opacity: .5; cursor: progress; }
+  .btn-primary { background: var(--sunset-gradient); color: var(--primary-foreground); border: none; }
+  .btn-ghost { background: transparent; }
+  .btn-danger { background: transparent; border-color: var(--err); color: var(--err); }
+  .btn-ghl { background: var(--ink); color: var(--lumi-cream); border: 1px solid var(--primary); }
+  .btn-ghl:hover { opacity: .9; }
+  .btn-row { display: flex; gap: .5rem; flex-wrap: wrap; margin-top: .75rem; }
+  .stat-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: .9rem; margin-bottom: 1.5rem; }
+  .stat-tile { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-xl); padding: 1rem 1.1rem; }
+  .stat-tile .n { font-family: "Space Grotesk", sans-serif; font-size: 1.8rem; font-weight: 700; }
+  .stat-tile .label { font-size: .72rem; text-transform: uppercase; letter-spacing: .06em; color: var(--muted-foreground); }
+  .stat-tile.awaiting .n { color: var(--amber); }
+  .stat-tile.partial .n { color: var(--err); }
+  .stat-tile.logged .n { color: var(--ok); }
+  .lead-card { border: 1px solid var(--border); border-radius: var(--radius-xl); padding: 1rem 1.2rem; margin-bottom: .9rem; background: var(--card); }
+  .lead-card.stale { border-color: oklch(83.5% .16 75 / .55); }
+  .lead-card.err { border-color: oklch(62% .22 25 / .6); }
+  .lead-card.partial { border-color: oklch(83.5% .16 75 / .4); }
+  .card-head { display: flex; align-items: baseline; gap: .6rem; flex-wrap: wrap; font-size: .78rem; color: var(--muted-foreground); }
+  .card-head .age { margin-left: auto; }
+  .quote { margin: .5rem 0 .25rem; font-size: .92rem; }
+  .quote::before { content: "\201C"; color: var(--muted-foreground); }
+  .quote::after { content: "\201D"; color: var(--muted-foreground); }
+  .tag { font-size: 0.63rem; background: var(--accent); padding: 0.1rem 0.45rem; border-radius: 0.3rem; text-transform: uppercase; letter-spacing: .03em; }
+  .status { padding: 0.15rem 0.55rem; border-radius: 1rem; font-size: 0.68rem; text-transform: uppercase; letter-spacing: .02em; background: var(--secondary); }
+  .pill { font-size: 0.68rem; padding: 0.12rem 0.5rem; border-radius: 1rem; display: inline-flex; align-items: center; gap: .3rem; }
+  .pill-ok { background: oklch(80% .16 145 / .18); color: var(--ok); }
+  .pill-err { background: oklch(62% .22 25 / .22); color: var(--err); }
+  .pill-warn { background: oklch(83.5% .16 75 / .22); color: var(--amber); }
+  .draft-slot { margin: .6rem 0; font-size: .85rem; color: var(--muted-foreground); }
+  .draft-box { background: oklch(16.4% 0 0 / .4); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: .7rem .85rem; margin: .5rem 0; }
+  .draft-box p { margin: 0 0 .4rem; font-size: .88rem; color: var(--foreground); }
+  .cite-chip { font-size: 0.62rem; background: var(--muted); color: var(--muted-foreground); padding: .05rem .4rem; border-radius: .3rem; margin-left: .3rem; }
+  .draft-urls { font-size: .72rem; color: var(--muted-foreground); margin-top: .4rem; word-break: break-all; }
+  .sent-slot { margin: .55rem 0 .35rem; }
+  .sent-slot .reply-toggle { font-size: .72rem; padding: .15rem .5rem; }
+  .sent-reply { margin-top: .35rem; }
+  .sent-reply .reply-meta { font-size: .72rem; color: var(--muted-foreground); margin: 0 0 .25rem; }
+  .crm-strip { display: flex; align-items: center; gap: .5rem; flex-wrap: wrap; font-size: .76rem; color: var(--muted-foreground); margin-top: .6rem; }
+  .edit-sentence { margin-bottom: .6rem; }
+  .edit-hint { font-size: .78rem; color: var(--muted-foreground); margin: .4rem 0 .8rem; }
+  .empty, .hint { color: var(--muted-foreground); font-size: 0.85rem; }
+  .flash { margin: 1rem 0 0; padding: .7rem 1rem; border-radius: var(--radius-sm); font-size: .85rem; border: 1px solid var(--border); background: var(--card); }
+  .flash.ok { border-color: var(--ok); background: oklch(80% .16 145 / .12); }
+  .flash.err { border-color: var(--err); background: oklch(62% .22 25 / .12); }
+  .flash.warn { border-color: var(--amber); background: oklch(83.5% .16 75 / .12); }
+  .msg-toggle { font-size: .7rem; padding: .1rem .4rem; }
+  .timeline { display: flex; flex-wrap: wrap; gap: .45rem; margin-top: .4rem; }
+  .step { display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.35rem 0.65rem; background: var(--secondary); border: 1px solid var(--border); border-radius: 0.5rem; font-size: .82rem; }
+  .step.err { border-color: oklch(62% .22 25 / .55); background: oklch(62% .22 25 / .12); }
+  .step .node { font-family: "Space Grotesk", sans-serif; font-weight: 600; letter-spacing: .02em; }
+  code { background: var(--muted); color: var(--foreground); padding: 0.1rem 0.3rem; border-radius: 0.3rem; font-size: .82rem; }
+  ul.violations, ul.tool-calls { list-style: none; padding: 0; margin: .4rem 0 0; display: flex; flex-direction: column; gap: .35rem; }
+  .reports-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; }
+  .report-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-xl); padding: 1.1rem 1.3rem; }
+  .report-card ol, .report-card ul { padding-left: 1.1rem; margin: .4rem 0; font-size: .85rem; }
+  #draft-editor { margin-top: 1rem; }
+  @media (max-width: 720px) {
+    .reports-grid, .stat-row { grid-template-columns: 1fr; }
+    main { padding: 0 1.1rem; }
+    header.desk-header { padding: 1rem 1.1rem 0; }
+  }
+</style>
+</head>
+<body>
+<header class="desk-header">
+  <div class="header-row">
+    <div class="wordmark"><span class="spark">&#10022;</span> Weekend Enquiry Desk</div>
+    <div class="crm-panel" id="crm-panel">
+      {% if crm.provider == "gohighlevel" and crm.ghl_configured %}
+      <span class="crm-dot on"></span><span class="live-badge" role="status"
+        title="GoHighLevel location {{ crm.ghl_location_id or 'unset' }}{{ ' - pipeline configured' if crm.ghl_pipeline else '' }}">GHL live</span> GoHighLevel
+      {% elif crm.provider == "gohighlevel" %}
+      <span class="crm-dot off"></span><span class="live-badge off" role="status"
+        title="CRM_PROVIDER=gohighlevel but GHL_PIT_TOKEN is not set">GHL off</span> GoHighLevel selected, not configured
+      {% elif crm.ghl_configured %}
+      <span class="crm-dot on"></span><span class="live-badge" role="status"
+        title="GoHighLevel location {{ crm.ghl_location_id or 'unset' }}{{ ' - pipeline configured' if crm.ghl_pipeline else '' }} - Supabase is the active CRM_PROVIDER">GHL ready</span> Supabase default
+      {% else %}
+      <span class="crm-dot off"></span><span class="live-badge off" role="status" title="GHL_PIT_TOKEN is not set">GHL off</span> Supabase (GHL not configured)
+      {% endif %}
+      {% if crm.wa_sandbox_configured %}
+      <span class="crm-dot {{ 'on' if crm.wa_sandbox_send else 'off' }}"></span>
+      <span class="live-badge {{ '' if crm.wa_sandbox_send else 'off' }}" role="status"
+        title="Twilio WhatsApp sandbox{{ ' - Approve sends live replies' if crm.wa_sandbox_send else ' - credentials present, TWILIO_WHATSAPP_SEND off (log-only)' }}{{ (' - demo ' + crm.wa_sandbox_demo_to) if crm.wa_sandbox_demo_to else '' }}">WA sandbox{% if crm.wa_sandbox_send %} ready{% else %} log-only{% endif %}</span>
+      {% endif %}
+      {% if crm.ghl_configured %}
+      <button type="button" class="btn-ghl" id="btn-demo-ghl">Demo GoHighLevel</button>
+      {% endif %}
+    </div>
+  </div>
+  <div class="marquee" aria-hidden="true">
+    <div class="marquee-track">
+      <span><b>NOTHING LEAVES UNTIL A HUMAN DECIDES</b> &#10022; NO SENDER IS CONFIGURED THAT COULD &#10022; SUNKSSD PORTFOLIO PROOF-OF-WORK &#10022; DOGS WELCOME &#10022; KIDS WELCOME &#10022;</span>
+      <span><b>NOTHING LEAVES UNTIL A HUMAN DECIDES</b> &#10022; NO SENDER IS CONFIGURED THAT COULD &#10022; SUNKSSD PORTFOLIO PROOF-OF-WORK &#10022; DOGS WELCOME &#10022; KIDS WELCOME &#10022;</span>
+    </div>
+  </div>
+</header>
+
+<main>
+<div id="flash" class="flash" hidden role="status"></div>
+<section class="panel">
+  <h3>Run a synthetic fixture</h3>
+  <form id="fixture-form">
+    <select name="fixture_id" id="fixture-id">
+      {% for f in fixtures %}
+      <option value="{{ f.id }}">{{ f.id }} [{{ f.category }}] - {{ f.body[:70] }}</option>
+      {% endfor %}
+    </select>
+    <button type="submit" class="btn-primary" id="btn-run-fixture">Run</button>
+  </form>
+</section>
+
+<div class="section-head">
+  <h2>Queue</h2>
+  <button type="button" class="btn-ghost" id="btn-refresh-queue">Refresh</button>
+</div>
+<div id="queue"><p class="empty">Loading&hellip;</p></div>
+
+<div class="section-head">
+  <h2>Run timeline</h2>
+</div>
+<section id="timeline" class="panel">
+  <p class="empty">Run a fixture or open a queue timeline.</p>
+</section>
+
+<section id="draft-editor" class="panel" hidden>
+  <h3>Edit draft</h3>
+  <p class="edit-hint">Saving re-runs all 11 policy rules. A passing recheck completes the send (no second approve).</p>
+  <p id="edit-editor-subject" class="hint"></p>
+  <div id="edit-form-body"></div>
+  <div class="btn-row">
+    <button type="button" class="btn-primary" id="btn-save-edit">save &amp; re-run the policy gate</button>
+    <button type="button" class="btn-ghost" id="btn-cancel-edit">cancel</button>
+  </div>
+</section>
+
+<div class="section-head">
+  <h2>Reports</h2>
+  <button type="button" class="btn-ghost" id="btn-refresh-reports">Refresh</button>
+</div>
+<div id="reports"><p class="empty">Loading&hellip;</p></div>
+</main>
+
+<script>
+(function () {
+  var CRM_GHL = {{ 'true' if crm.ghl_configured else 'false' }};
+  // Must match app.main._SYNCABLE_LEAD_STATUSES - a lead still mid-approval
+  // has no sent_log row yet, so the backend 409s a sync attempt on it. Hiding
+  // the button for those rows is the UX side of that same rule, not a
+  // separate decision.
+  var DECIDED_LEAD_STATUSES = ['approved_logged', 'awaiting_ops_quote'];
+  var POLL_MS = 5000;
+  var editThreadId = null;
+  var pollTimer = null;
+  var flashTimer = null;
+
+  function esc(s) {
+    return String(s == null ? '' : s)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+  }
+
+  function flash(kind, msg) {
+    var el = document.getElementById('flash');
+    el.className = 'flash ' + kind;
+    el.textContent = msg;
+    el.hidden = false;
+    if (flashTimer) clearTimeout(flashTimer);
+    flashTimer = setTimeout(function () { el.hidden = true; }, 8000);
+  }
+
+  async function api(method, path, body) {
+    var opts = { method: method, headers: { 'Accept': 'application/json' } };
+    if (body !== undefined) {
+      opts.headers['Content-Type'] = 'application/json';
+      opts.body = JSON.stringify(body);
+    }
+    var resp = await fetch(path, opts);
+    var ct = resp.headers.get('content-type') || '';
+    var data = ct.indexOf('application/json') >= 0 ? await resp.json() : null;
+    if (!resp.ok) {
+      var msg = (data && (data.detail || data.message)) || (resp.status + ' ' + resp.statusText);
+      throw new Error(typeof msg === 'string' ? msg : JSON.stringify(msg));
+    }
+    return data;
+  }
+
+  function renderStats(stats) {
+    return '<div class="stat-row">'
+      + '<div class="stat-tile awaiting"><div class="n">' + esc(stats.awaiting) + '</div><div class="label">Awaiting</div></div>'
+      + '<div class="stat-tile partial"><div class="n">' + esc(stats.partial) + '</div><div class="label">Partial / CRM failed</div></div>'
+      + '<div class="stat-tile logged"><div class="n">' + esc(stats.logged) + '</div><div class="label">Logged</div></div>'
+      + '</div>';
+  }
+
+  function crmStrip(r) {
+    var html = '<p class="crm-strip">';
+    if (r.crm_status === 'synced') {
+      html += '<span class="pill pill-ok">' + esc(r.crm_provider) + ' · synced</span>';
+      if (r.crm_external_id) html += '<code>' + esc(r.crm_external_id) + '</code>';
+      if (r.crm_url) html += '<a href="' + esc(r.crm_url) + '" target="_blank" rel="noopener">↗ GHL contact</a>';
+    } else if (r.crm_status === 'failed') {
+      html += '<span class="pill pill-err">' + esc(r.crm_provider) + ' · failed</span>';
+      if (r.crm_error) html += '<span>' + esc(String(r.crm_error).slice(0, 120)) + '</span>';
+    } else {
+      html += '<span class="pill pill-warn">not synced</span>';
+    }
+    if (r.crm_attempts && r.crm_attempts > 1) html += '<span>' + esc(r.crm_attempts) + '× attempted</span>';
+    if (r.wa_status === 'synced') {
+      html += '<span class="pill pill-ok">whatsapp · sent</span>';
+      if (r.wa_external_id) html += '<code>' + esc(r.wa_external_id) + '</code>';
+      if (r.wa_to_address) html += '<span>' + esc(r.wa_to_address) + '</span>';
+    } else if (r.wa_status === 'failed') {
+      html += '<span class="pill pill-err">whatsapp · failed</span>';
+      if (r.wa_error) html += '<span>' + esc(String(r.wa_error).slice(0, 120)) + '</span>';
+    } else if (r.wa_status === 'skipped') {
+      html += '<span class="pill pill-warn">whatsapp · skipped</span>';
+    }
+    if (r.wa_attempts && r.wa_attempts > 1) html += '<span>' + esc(r.wa_attempts) + '× wa attempted</span>';
+    return html + '</p>';
+  }
+
+  function renderDraftPanel(threadId, data) {
+    if (!data.draft) {
+      if (data.run_status === 'error') return '<p class="empty">run failed — no draft to decide.</p>';
+      if (data.run_status === 'done' || data.run_status === 'partial') {
+        return '<p class="empty">run finished — no pending draft.</p>';
+      }
+      return '<p class="empty">drafting — not ready to decide yet. Press Refresh after the run finishes.</p>';
+    }
+    var sentences = data.draft.sentences || [];
+    var html = '<div class="draft-box">';
+    sentences.forEach(function (s) {
+      html += '<p>' + esc(s.text);
+      (s.cites || []).forEach(function (c) { html += '<span class="cite-chip">' + esc(c) + '</span>'; });
+      html += '</p>';
+    });
+    if (!sentences.length) html += '<p class="empty">Empty draft.</p>';
+    if (data.draft.urls && data.draft.urls.length) {
+      html += '<p class="draft-urls">' + data.draft.urls.map(esc).join(' · ') + '</p>';
+    }
+    html += '</div>';
+    var policy = data.policy_result || null;
+    if (policy && policy.passed === false && (policy.violations || []).length) {
+      html += '<p class="edit-hint">Policy gate blocked this draft'
+        + (policy.violations[0].rule_id ? (' (' + esc(policy.violations[0].rule_id) + ')') : '')
+        + ' — edit into a safer reply, approve &amp; send anyway, or dismiss.</p>';
+    }
+    if (data.interrupted) {
+      html += '<div class="btn-row">'
+        + '<button type="button" class="btn-primary" data-action="approve" data-thread="' + esc(threadId) + '">approve</button>'
+        + '<button type="button" class="btn-ghost" data-action="edit" data-thread="' + esc(threadId) + '">edit</button>'
+        + '<button type="button" class="btn-danger" data-action="dismiss" data-thread="' + esc(threadId) + '">dismiss</button>'
+        + '</div>';
+    } else {
+      html += '<p class="empty">Draft ready — waiting for interrupt / policy.</p>';
+    }
+    return html;
+  }
+
+  function renderSentReplyPanel(r) {
+    var cites = (r.sent_citation_block && r.sent_citation_block.cites) || [];
+    var urls = (r.sent_citation_block && r.sent_citation_block.urls) || [];
+    var html = '<p class="reply-meta">Logged reply'
+      + (r.sent_would_send_to ? (' → ' + esc(r.sent_would_send_to)) : '')
+      + ' · read-only</p>';
+    html += '<div class="draft-box">';
+    html += '<p>' + esc(r.sent_body || '');
+    cites.forEach(function (c) { html += '<span class="cite-chip">' + esc(c) + '</span>'; });
+    html += '</p>';
+    if (urls.length) {
+      html += '<p class="draft-urls">' + urls.map(esc).join(' · ') + '</p>';
+    }
+    html += '</div>';
+    return html;
+  }
+
+  async function loadDraftInto(el, threadId) {
+    // No "Loading draft…" reset here: this is also called on a 5s poll for
+    // cards still drafting, and blanking the slot on every poll before the
+    // fetch resolves was the "cards glitch continuously" bug - it rewrote
+    // visible content every cycle even when nothing had changed yet.
+    try {
+      var data = await api('GET', '/api/drafts/' + encodeURIComponent(threadId));
+      el.innerHTML = renderDraftPanel(threadId, data);
+      el.dataset.draftJson = JSON.stringify(data);
+      // The checkpointer's interrupt flag is the authoritative "can a human
+      // decide this", not agent_runs.status (see app.main._show_draft_slot) -
+      // once a draft actually arrives interrupted, say so on the card even if
+      // the row's own status chip is stale.
+      if (data.interrupted) {
+        var card = el.closest('article.lead-card');
+        var statusEl = card && card.querySelector('.status');
+        if (statusEl) statusEl.textContent = 'awaiting your decision';
+      }
+    } catch (e) {
+      el.innerHTML = '<p class="empty">' + esc(e.message) + '</p>';
+    }
+  }
+
+  function draftSlotStillDrafting(slot) {
+    var raw = slot.dataset.draftJson;
+    if (!raw) return true;
+    try {
+      var data = JSON.parse(raw);
+      return data.interrupted === false
+        && data.run_status !== 'error' && data.run_status !== 'done' && data.run_status !== 'partial';
+    } catch (e) {
+      return true;
+    }
+  }
+
+  function renderCard(r) {
+    var cls = 'lead-card'
+      + (r.stale ? ' stale' : '')
+      + (r.run_status === 'error' ? ' err' : '')
+      + (r.run_status === 'partial' ? ' partial' : '');
+    var html = '<article class="' + cls + '" data-run-id="' + esc(r.run_id) + '">';
+    html += '<div class="card-head">';
+    html += '<span>' + esc(r.channel) + '</span>';
+    if (r.is_synthetic) html += '<span class="tag">SYNTHETIC</span>';
+    html += '<span>' + esc(r.intent || '-') + '</span>';
+    if (r.pet_flag) html += '🐕';
+    if (r.kid_flag) html += '🧒';
+    if (r.party_size) html += ' ×' + esc(r.party_size);
+    html += '<span class="status">' + esc(r.lead_status || r.run_status) + '</span>';
+    html += '<span class="age">' + esc(r.age) + '</span></div>';
+
+    var body = r.body || '';
+    var shortBody = body.length > 160 ? body.slice(0, 160) + '…' : body;
+    html += '<p class="quote"><span class="quote-text">' + esc(shortBody) + '</span>';
+    if (body.length > 160) {
+      html += ' <button type="button" class="btn-ghost msg-toggle" data-action="toggle-body" data-expanded="false" '
+        + 'data-short="' + esc(shortBody) + '" data-full="' + esc(body) + '">show full message</button>';
+    }
+    html += '</p>';
+
+    if (r.show_draft && r.thread_id) {
+      html += '<div class="draft-slot" data-thread="' + esc(r.thread_id) + '">Loading draft…</div>';
+    }
+    if (r.show_sent_reply && r.sent_body) {
+      html += '<div class="sent-slot">';
+      html += '<button type="button" class="btn-ghost reply-toggle" data-action="toggle-reply" '
+        + 'data-expanded="false" aria-expanded="false">show reply</button>';
+      html += '<div class="sent-reply" hidden>' + renderSentReplyPanel(r) + '</div>';
+      html += '</div>';
+    }
+    html += crmStrip(r);
+    html += '<div class="btn-row">';
+    html += '<button type="button" class="btn-ghost" data-action="timeline" data-run="' + esc(r.run_id) + '">timeline</button>';
+    html += '<button type="button" class="btn-ghost" data-action="rerun" data-run="' + esc(r.run_id) + '" '
+      + 'title="Re-shoot this message into the pipeline, keeping original channel and arrival time">'
+      + 're-run pipeline</button>';
+    if (r.run_status === 'partial' && r.lead_id) {
+      html += '<button type="button" class="btn-primary" data-action="retry-crm" data-lead="' + esc(r.lead_id) + '">retry CRM</button>';
+    }
+    if (CRM_GHL && r.lead_id && DECIDED_LEAD_STATUSES.indexOf(r.lead_status) !== -1) {
+      html += '<button type="button" class="btn-ghl" data-action="push-ghl" data-lead="' + esc(r.lead_id) + '">Push to GoHighLevel</button>';
+    }
+    html += '</div></article>';
+    return html;
+  }
+
+  function patchQueue(root, html) {
+    // Reconciles by data-run-id instead of root.innerHTML = html: a full wipe
+    // collapsed the page height and jumped the scroll position on every
+    // refresh (the "cards keep on glitching" complaint), and re-fetched every
+    // card's draft from scratch even when nothing about it had changed.
+    var temp = document.createElement('div');
+    temp.innerHTML = html;
+
+    var newStat = temp.querySelector('.stat-row');
+    var oldStat = root.querySelector('.stat-row');
+    if (newStat) {
+      if (oldStat) oldStat.replaceWith(newStat); else root.insertBefore(newStat, root.firstChild);
+    } else if (oldStat) {
+      oldStat.remove();
+    }
+
+    var oldCardsById = {};
+    root.querySelectorAll('article.lead-card[data-run-id]').forEach(function (el) {
+      oldCardsById[el.getAttribute('data-run-id')] = el;
+    });
+
+    var keepIds = {};
+    Array.prototype.forEach.call(temp.querySelectorAll('article.lead-card[data-run-id]'), function (newEl) {
+      var id = newEl.getAttribute('data-run-id');
+      keepIds[id] = true;
+      var oldEl = oldCardsById[id];
+      if (oldEl) {
+        // Carry over anything already loaded/expanded client-side so a
+        // routine refresh doesn't re-fetch a draft or collapse an expanded
+        // message the operator just opened.
+        var oldSlot = oldEl.querySelector('.draft-slot[data-thread]');
+        var newSlot = newEl.querySelector('.draft-slot[data-thread]');
+        if (oldSlot && newSlot && oldSlot.dataset.draftJson) {
+          newSlot.innerHTML = oldSlot.innerHTML;
+          newSlot.dataset.draftJson = oldSlot.dataset.draftJson;
+          // Re-apply the same "awaiting your decision" override loadDraftInto
+          // sets on a live fetch - the new article has a fresh (possibly
+          // stale) status chip from the server, and this slot's content was
+          // just transplanted rather than re-fetched, so nothing else would.
+          try {
+            if (JSON.parse(oldSlot.dataset.draftJson).interrupted) {
+              var statusEl = newEl.querySelector('.status');
+              if (statusEl) statusEl.textContent = 'awaiting your decision';
+            }
+          } catch (e) { /* malformed cached json - leave the fresh status alone */ }
+        }
+        var oldToggle = oldEl.querySelector('.msg-toggle');
+        var newToggle = newEl.querySelector('.msg-toggle');
+        if (oldToggle && newToggle && oldToggle.getAttribute('data-expanded') === 'true') {
+          newToggle.setAttribute('data-expanded', 'true');
+          newToggle.textContent = 'show less';
+          var newText = newEl.querySelector('.quote-text');
+          if (newText) newText.textContent = newToggle.getAttribute('data-full');
+        }
+        var oldReplyToggle = oldEl.querySelector('.reply-toggle');
+        var newReplyToggle = newEl.querySelector('.reply-toggle');
+        var newReply = newEl.querySelector('.sent-reply');
+        if (oldReplyToggle && newReplyToggle && newReply
+            && oldReplyToggle.getAttribute('data-expanded') === 'true') {
+          newReplyToggle.setAttribute('data-expanded', 'true');
+          newReplyToggle.setAttribute('aria-expanded', 'true');
+          newReplyToggle.textContent = 'hide reply';
+          newReply.hidden = false;
+        }
+      }
+      // appendChild moves an existing node (no re-render, no flicker) or
+      // inserts the new one - either way this also fixes ordering for free,
+      // since we're appending in the server's own (oldest-first) order.
+      root.appendChild(newEl);
+      if (oldEl) oldEl.remove();
+    });
+
+    Object.keys(oldCardsById).forEach(function (id) {
+      if (!keepIds[id]) oldCardsById[id].remove();
+    });
+
+    var newEmpty = temp.querySelector('p.empty.panel');
+    var oldEmpty = root.querySelector('p.empty.panel');
+    if (newEmpty) {
+      if (oldEmpty) oldEmpty.replaceWith(newEmpty); else root.appendChild(newEmpty);
+    } else if (oldEmpty) {
+      oldEmpty.remove();
+    }
+  }
+
+  async function refreshQueue() {
+    var root = document.getElementById('queue');
+    if (editThreadId) {
+      // Keep queue DOM stable while editing — operator can still cancel/save.
+      // (The Refresh button is disabled with an explanatory title for the
+      // duration - see setQueueRefreshEditingState - so this is a defensive
+      // backstop, not how the no-op is communicated.)
+      return;
+    }
+    root.setAttribute('aria-busy', 'true');
+    // patchQueue only knows how to reconcile .stat-row/.lead-card/
+    // p.empty.panel - the very first load still has the server-rendered
+    // "Loading…" placeholder (just class="empty", no managed element yet),
+    // so that one case is a plain replace; every load after is a patch.
+    // Computed before the fetch so it's also available if the fetch throws.
+    var hasManagedContent = !!(root.querySelector('.stat-row')
+      || root.querySelector('article.lead-card') || root.querySelector('p.empty.panel'));
+    try {
+      var data = await api('GET', '/api/queue');
+      var html = data.rows.length
+        ? renderStats(data.stats) + data.rows.map(renderCard).join('')
+        : renderStats(data.stats) + '<p class="empty panel">Queue is empty - run a fixture above.</p>';
+      if (hasManagedContent) {
+        patchQueue(root, html);
+      } else {
+        root.innerHTML = html;
+      }
+      var newSlots = root.querySelectorAll('.draft-slot[data-thread]');
+      newSlots.forEach(function (slot) {
+        // Only fetch slots that don't already carry a draft - patchQueue
+        // already transplanted any that did.
+        if (!slot.dataset.draftJson) loadDraftInto(slot, slot.getAttribute('data-thread'));
+      });
+    } catch (e) {
+      if (hasManagedContent) {
+        flash('err', 'Queue refresh failed: ' + e.message);
+      } else {
+        root.innerHTML = '<p class="empty">' + esc(e.message) + '</p>';
+      }
+    } finally {
+      root.removeAttribute('aria-busy');
+    }
+  }
+
+  function pollDraftingSlots() {
+    if (document.hidden || editThreadId) return;
+    document.querySelectorAll('#queue .draft-slot[data-thread]').forEach(function (slot) {
+      if (draftSlotStillDrafting(slot)) loadDraftInto(slot, slot.getAttribute('data-thread'));
+    });
+  }
+
+  function startPolling() {
+    if (!pollTimer) pollTimer = setInterval(pollDraftingSlots, POLL_MS);
+  }
+
+  function stopPolling() {
+    if (pollTimer) { clearInterval(pollTimer); pollTimer = null; }
+  }
+
+  document.addEventListener('visibilitychange', function () {
+    if (document.hidden) stopPolling(); else startPolling();
+  });
+
+  function setQueueRefreshEditingState(isEditing) {
+    var btn = document.getElementById('btn-refresh-queue');
+    btn.disabled = isEditing;
+    btn.title = isEditing ? 'Finish or cancel the edit below before refreshing the queue' : '';
+  }
+
+  async function refreshReports() {
+    var root = document.getElementById('reports');
+    root.innerHTML = '<p class="empty">Loading…</p>';
+    try {
+      var data = await api('GET', '/api/reports');
+      var gap = data.content_gap || [];
+      var demand = data.demand || {};
+      var html = '<div class="reports-grid"><div class="report-card"><h3>Content gap</h3>'
+        + '<p class="hint">Questions sunkssd.io does not answer, ranked by how often guests asked.</p>';
+      if (gap.length) {
+        html += '<ol>';
+        gap.forEach(function (row) {
+          html += '<li><strong>' + esc(row.occurrences) + '×</strong> ' + esc(row.missing_fact) + '</li>';
+        });
+        html += '</ol>';
+      } else {
+        html += '<p class="empty">No escalations yet - run some fixtures above.</p>';
+      }
+      html += '</div><div class="report-card"><h3>Demand signal</h3>'
+        + '<p class="hint">What SevenRooms cannot see: people who asked and have not booked.</p>'
+        + '<p>Total leads: <strong>' + esc(demand.total_leads) + '</strong></p>'
+        + '<p>Mention a dog: <strong>' + esc(demand.pet_flag_count) + '</strong> · Mention kids: <strong>' + esc(demand.kid_flag_count) + '</strong></p>'
+        + '<p>By intent:</p><ul>';
+      Object.keys(demand.by_intent || {}).forEach(function (k) {
+        html += '<li>' + esc(k) + ': ' + esc(demand.by_intent[k]) + '</li>';
+      });
+      html += '</ul><p>By party size:</p><ul>';
+      Object.keys(demand.by_party_size || {}).forEach(function (k) {
+        html += '<li>' + esc(k) + ': ' + esc(demand.by_party_size[k]) + '</li>';
+      });
+      html += '</ul><p>Unconverted:</p><ul>';
+      Object.keys(demand.unconverted_by_status || {}).forEach(function (k) {
+        html += '<li>' + esc(k) + ': ' + esc(demand.unconverted_by_status[k]) + '</li>';
+      });
+      html += '</ul></div></div>';
+      root.innerHTML = html;
+    } catch (e) {
+      root.innerHTML = '<p class="empty">' + esc(e.message) + '</p>';
+    }
+  }
+
+  async function showTimeline(runId) {
+    var root = document.getElementById('timeline');
+    root.innerHTML = '<p class="empty">Loading…</p>';
+    try {
+      var data = await api('GET', '/api/runs/' + encodeURIComponent(runId) + '/timeline');
+      var html = '<h3>Run ' + esc(String(data.run_id || runId).slice(0, 8)) + '</h3><div class="timeline">';
+      (data.steps || []).forEach(function (s) {
+        html += '<div class="step' + (s.error ? ' err' : '') + '"><span class="node">' + esc(s.node) + '</span>'
+          + (s.error ? '<span class="pill pill-err">' + esc(s.error) + '</span>' : '<span class="pill pill-ok">ok</span>')
+          + '</div>';
+      });
+      if (!(data.steps || []).length) {
+        html += '<p class="empty">No steps recorded yet.</p>';
+      }
+      html += '</div>';
+      if (data.violations && data.violations.length) {
+        html += '<h4>Policy</h4><ul class="violations">';
+        data.violations.forEach(function (v) {
+          var sev = (v.severity === 'critical' || v.severity === 'high') ? 'err' : 'warn';
+          html += '<li class="pill pill-' + sev + '">' + esc(v.rule_id) + ' - ' + esc(v.detail) + '</li>';
+        });
+        html += '</ul>';
+      }
+      if (data.tool_calls && data.tool_calls.length) {
+        html += '<h4>Tool calls</h4><ul class="tool-calls">';
+        data.tool_calls.forEach(function (t) {
+          html += '<li><code>' + esc(t.tool_name) + '</code> ' + esc(t.ms) + 'ms'
+            + (t.error ? ' <span class="pill pill-err">' + esc(t.error) + '</span>' : '') + '</li>';
+        });
+        html += '</ul>';
+      }
+      if (data.crm) {
+        html += '<h4>CRM sync</h4><p class="crm-strip"><span class="pill '
+          + (data.crm.status === 'synced' ? 'pill-ok' : 'pill-err') + '">'
+          + esc(data.crm.provider) + ' · ' + esc(data.crm.status) + '</span>';
+        if (data.crm.external_id) html += '<code>' + esc(data.crm.external_id) + '</code>';
+        if (data.crm.error) html += esc(data.crm.error);
+        html += '</p>';
+      }
+      if (data.channel_delivery) {
+        var cd = data.channel_delivery;
+        var cdPill = cd.status === 'synced' ? 'pill-ok' : (cd.status === 'failed' ? 'pill-err' : 'pill-warn');
+        html += '<h4>WhatsApp delivery</h4><p class="crm-strip"><span class="pill ' + cdPill + '">'
+          + esc(cd.provider || 'twilio_whatsapp') + ' · ' + esc(cd.status) + '</span>';
+        if (cd.external_id) html += '<code>' + esc(cd.external_id) + '</code>';
+        if (cd.to_address) html += '<span>' + esc(cd.to_address) + '</span>';
+        if (cd.error) html += esc(cd.error);
+        html += '</p>';
+      }
+      root.innerHTML = html;
+    } catch (e) {
+      root.innerHTML = '<p class="empty">' + esc(e.message) + '</p>';
+    }
+  }
+
+  function openEditor(threadId, draftData, cardInfo) {
+    editThreadId = threadId;
+    setQueueRefreshEditingState(true);
+    var body = document.getElementById('edit-form-body');
+    var sentences = (draftData.draft && draftData.draft.sentences) || [];
+    var html = '';
+    sentences.forEach(function (s, i) {
+      html += '<div class="edit-sentence"><textarea rows="2" data-idx="' + i + '" data-cites=\''
+        + esc(JSON.stringify(s.cites || [])) + '\' data-non-factual="'
+        + (s.non_factual ? 'true' : 'false') + '">' + esc(s.text) + '</textarea></div>';
+    });
+    if (!sentences.length) html = '<p class="empty">No draft sentences to edit.</p>';
+    body.innerHTML = html;
+    body.dataset.urls = JSON.stringify((draftData.draft && draftData.draft.urls) || []);
+
+    var subject = document.getElementById('edit-editor-subject');
+    subject.textContent = cardInfo ? ('Editing: ' + cardInfo.channel + ' · "' + cardInfo.excerpt + '"') : '';
+
+    var panel = document.getElementById('draft-editor');
+    panel.hidden = false;
+    // Without this the editor opens off-screen below the queue and the
+    // timeline - with a full queue it looked exactly like the button had
+    // done nothing ("I am not able to edit any of the messages").
+    panel.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    var firstTextarea = body.querySelector('textarea');
+    if (firstTextarea) firstTextarea.focus();
+  }
+
+  function closeEditor() {
+    editThreadId = null;
+    setQueueRefreshEditingState(false);
+    document.getElementById('draft-editor').hidden = true;
+    document.getElementById('edit-form-body').innerHTML = '';
+  }
+
+  async function afterMutate(runId) {
+    await refreshQueue();
+    await refreshReports();
+    if (runId) await showTimeline(runId);
+  }
+
+  // What actually happened to a decision, in plain language - replaces the
+  // previous silence (approve/dismiss gave no feedback beyond the queue
+  // re-rendering) and the previous alert()s (which blocked the page and
+  // told the operator nothing about *why* an edit disappeared into an
+  // escalation).
+  function flashForDecide(action, result) {
+    if (action === 'dismiss') return { kind: 'ok', msg: 'Dismissed - nothing was sent.' };
+    if (action === 'edit') {
+      var policy = result.policy_result || {};
+      if (policy.passed === false) {
+        var v = (policy.violations || [])[0];
+        return { kind: 'err', msg: v
+          ? ('Edit rejected by ' + v.rule_id + ': ' + v.detail + ' - lead escalated to a human, no override.')
+          : 'Edit rejected by the policy gate - lead escalated to a human, no override.' };
+      }
+      return { kind: 'ok', msg: 'Edit passed the policy gate - logged, nothing was sent a second time.' };
+    }
+    // approve (human override sends even when policy failed; escalate here is rare)
+    if (result.ops_action === 'escalate') {
+      return { kind: 'warn', msg: 'Escalated - nothing was sent on WhatsApp.' };
+    }
+    if (result.crm_status === 'failed' && result.wa_status === 'failed') {
+      return { kind: 'warn', msg: 'Approved and logged - CRM and WhatsApp delivery both failed.' };
+    }
+    if (result.wa_status === 'failed') {
+      return { kind: 'warn', msg: 'Approved and logged - WhatsApp send failed: ' + (result.wa_error || 'unknown error') };
+    }
+    if (result.crm_status === 'failed') {
+      return { kind: 'warn', msg: 'Approved and logged - CRM sync failed. Use "retry CRM" on the card.' };
+    }
+    if (result.wa_status === 'synced') {
+      return { kind: 'ok', msg: 'Approved - logged, sent on WhatsApp, and synced to the CRM.' };
+    }
+    return { kind: 'ok', msg: 'Approved - logged and synced to the CRM.' };
+  }
+
+  document.getElementById('fixture-form').addEventListener('submit', async function (e) {
+    e.preventDefault();
+    var btn = document.getElementById('btn-run-fixture');
+    btn.disabled = true;
+    try {
+      var id = document.getElementById('fixture-id').value;
+      var data = await api('POST', '/api/fixture', { fixture_id: id });
+      await afterMutate(data.run_id);
+    } catch (err) {
+      flash('err', err.message);
+    } finally {
+      btn.disabled = false;
+    }
+  });
+
+  document.getElementById('btn-refresh-queue').addEventListener('click', function () {
+    refreshQueue();
+  });
+  document.getElementById('btn-refresh-reports').addEventListener('click', function () {
+    refreshReports();
+  });
+
+  var demo = document.getElementById('btn-demo-ghl');
+  if (demo) {
+    demo.addEventListener('click', async function () {
+      demo.disabled = true;
+      try {
+        var data = await api('POST', '/api/demo-ghl-sync', {});
+        flash('ok', 'Synced to GoHighLevel.');
+        await afterMutate(data.run_id);
+      } catch (err) {
+        flash('err', err.message);
+      } finally {
+        demo.disabled = false;
+      }
+    });
+  }
+
+  function toggleMessageBody(btn) {
+    var expanded = btn.getAttribute('data-expanded') === 'true';
+    var textEl = btn.closest('p.quote').querySelector('.quote-text');
+    if (expanded) {
+      textEl.textContent = btn.getAttribute('data-short');
+      btn.textContent = 'show full message';
+      btn.setAttribute('data-expanded', 'false');
+    } else {
+      textEl.textContent = btn.getAttribute('data-full');
+      btn.textContent = 'show less';
+      btn.setAttribute('data-expanded', 'true');
+    }
+  }
+
+  function toggleSentReply(btn) {
+    var slot = btn.closest('.sent-slot');
+    var panel = slot && slot.querySelector('.sent-reply');
+    if (!panel) return;
+    var expanded = btn.getAttribute('data-expanded') === 'true';
+    if (expanded) {
+      panel.hidden = true;
+      btn.textContent = 'show reply';
+      btn.setAttribute('data-expanded', 'false');
+      btn.setAttribute('aria-expanded', 'false');
+    } else {
+      panel.hidden = false;
+      btn.textContent = 'hide reply';
+      btn.setAttribute('data-expanded', 'true');
+      btn.setAttribute('aria-expanded', 'true');
+    }
+  }
+
+  document.getElementById('queue').addEventListener('click', async function (e) {
+    var btn = e.target.closest('button[data-action]');
+    if (!btn) return;
+    var action = btn.getAttribute('data-action');
+    if (action === 'toggle-body') {
+      // Instant, client-only, no network round trip - skip the disable/
+      // re-enable dance below entirely.
+      toggleMessageBody(btn);
+      return;
+    }
+    if (action === 'toggle-reply') {
+      toggleSentReply(btn);
+      return;
+    }
+    btn.disabled = true;
+    try {
+      if (action === 'timeline') {
+        await showTimeline(btn.getAttribute('data-run'));
+      } else if (action === 'rerun') {
+        var rr = await api('POST', '/api/rerun', { run_id: btn.getAttribute('data-run') });
+        flash('ok', 'Re-queued — previous card replaced, original channel and arrival kept.');
+        await afterMutate(rr.run_id);
+      } else if (action === 'retry-crm') {
+        var r1 = await api('POST', '/api/retry-crm', { lead_id: btn.getAttribute('data-lead') });
+        flash(r1.crm_status === 'synced' ? 'ok' : 'err',
+          r1.crm_status === 'synced' ? 'CRM retry succeeded.' : ('CRM retry failed: ' + (r1.error || 'unknown error')));
+        await afterMutate(r1.run_id);
+      } else if (action === 'push-ghl') {
+        var r2 = await api('POST', '/api/demo-ghl-sync', { lead_id: btn.getAttribute('data-lead') });
+        flash('ok', 'Synced to GoHighLevel.');
+        await afterMutate(r2.run_id);
+      } else if (action === 'approve' || action === 'dismiss') {
+        var thread = btn.getAttribute('data-thread');
+        var r3 = await api('POST', '/api/decide', { thread_id: thread, action: action });
+        var f3 = flashForDecide(action, r3);
+        flash(f3.kind, f3.msg);
+        await afterMutate(r3.run_id);
+      } else if (action === 'edit') {
+        var slot = btn.closest('.draft-slot');
+        var payload = slot && slot.dataset.draftJson ? JSON.parse(slot.dataset.draftJson) : null;
+        if (!payload) {
+          payload = await api('GET', '/api/drafts/' + encodeURIComponent(btn.getAttribute('data-thread')));
+        }
+        var card = btn.closest('article.lead-card');
+        var channelEl = card && card.querySelector('.card-head span');
+        var excerptEl = card && card.querySelector('.quote-text');
+        var cardInfo = card ? {
+          channel: channelEl ? channelEl.textContent : '',
+          excerpt: excerptEl ? excerptEl.textContent : '',
+        } : null;
+        openEditor(btn.getAttribute('data-thread'), payload, cardInfo);
+      }
+    } catch (err) {
+      flash('err', err.message);
+    } finally {
+      btn.disabled = false;
+    }
+  });
+
+  document.getElementById('btn-cancel-edit').addEventListener('click', function () {
+    closeEditor();
+    refreshQueue();
+  });
+
+  document.getElementById('btn-save-edit').addEventListener('click', async function () {
+    if (!editThreadId) return;
+    var btn = document.getElementById('btn-save-edit');
+    btn.disabled = true;
+    try {
+      var edited = [];
+      document.querySelectorAll('#edit-form-body textarea').forEach(function (ta) {
+        var cites = [];
+        try { cites = JSON.parse(ta.getAttribute('data-cites') || '[]'); } catch (e) { cites = []; }
+        edited.push({
+          text: ta.value,
+          cites: cites,
+          non_factual: ta.getAttribute('data-non-factual') === 'true',
+        });
+      });
+      var result = await api('POST', '/api/decide', {
+        thread_id: editThreadId,
+        action: 'edit',
+        edited_sentences: edited,
+      });
+      var f = flashForDecide('edit', result);
+      closeEditor();
+      flash(f.kind, f.msg);
+      await afterMutate(result.run_id);
+    } catch (err) {
+      flash('err', err.message);
+    } finally {
+      btn.disabled = false;
+    }
+  });
+
+  refreshQueue();
+  refreshReports();
+  startPolling();
+})();
+</script>
+</body>
+</html>

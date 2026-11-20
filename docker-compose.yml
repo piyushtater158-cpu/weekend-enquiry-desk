@@ -1,0 +1,13 @@
+services:
+  weekend-enquiry-desk:
+    build: .
+    container_name: weekend-enquiry-desk
+    env_file: .env
+    ports:
+      # 127.0.0.1-only: the security review flagged that "8000:8000" binds all
+      # interfaces, letting traffic skip the reverse proxy (and its TLS) entirely.
+      - "127.0.0.1:8001:8000"
+    restart: unless-stopped
+    # Own default bridge network, not joined to any other stack's network - a
+    # Compose service never shares a network with another project's containers
+    # (e.g. this VM's existing n8n stack) unless explicitly told to.

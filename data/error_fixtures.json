@@ -1,0 +1,18 @@
+[
+  {
+    "id": "err-model-timeout",
+    "label": "SYNTHETIC",
+    "category": "error_fixture",
+    "channel": "whatsapp",
+    "body": "FIXTURE_MODEL_TIMEOUT hello, testing a slow model call",
+    "notes": "Sentinel caught by app/llm.py's call_llm(). Run marked error, lead still created as escalated so the enquiry is never silently lost."
+  },
+  {
+    "id": "err-crm-fail",
+    "label": "SYNTHETIC",
+    "category": "error_fixture",
+    "channel": "whatsapp",
+    "body": "FIXTURE_CRM_FAIL can I bring my dog this Saturday?",
+    "notes": "Sentinel caught by app/nodes/ops.py. Supabase lead is written and the draft is approved normally; the CRM sync step fails deterministically, run marked partial, UI offers retry."
+  }
+]

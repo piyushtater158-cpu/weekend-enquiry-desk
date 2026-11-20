@@ -1,0 +1,42 @@
+# Secrets. .env.example is the only env file that belongs in git.
+.env
+.env.*
+!.env.example
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.eggs/
+dist/
+build/
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+.coverage.*
+htmlcov/
+.tox/
+.nox/
+
+# Local tooling and editor state
+.vercel/
+.cursor/
+.idea/
+.vscode/
+
+# OS junk
+.DS_Store
+Thumbs.db
+desktop.ini
+*.log
+
+# Accidental Windows path copies (empty siblings of migrations/ and tests/)
+migrations;C/
+tests;C/
+
+# Raw scraped HTML. The processed corpus (chunks.json, events.json, site-styles.css) stays tracked.
+data/corpus/*.html

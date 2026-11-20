@@ -1,0 +1,14 @@
+fastapi
+uvicorn[standard]
+jinja2
+python-multipart
+httpx
+pyyaml
+psycopg[binary]
+langgraph
+langgraph-checkpoint-postgres
+langchain-core
+beautifulsoup4
+twilio
+pytest
+pytest-asyncio

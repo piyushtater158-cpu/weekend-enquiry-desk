@@ -1,0 +1,11 @@
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+markers = [
+    "live: hits a real external service (GHL sandbox, real LLM). Deselected by default.",
+]
+addopts = "-m 'not live' -p no:langsmith"
+asyncio_default_fixture_loop_scope = "function"
+# -p no:langsmith: this machine's Windows Application Control policy blocks the native
+# uuid_utils DLL that langsmith's pytest plugin imports transitively via langgraph/langchain-core.
+# Unrelated to this project's code. Revisit once LangGraph tests actually need tracing.
