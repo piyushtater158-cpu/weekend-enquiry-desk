@@ -11,9 +11,9 @@ from app.twilio_whatsapp import normalize_wa_address, send_whatsapp, whatsapp_se
 
 
 def test_normalize_wa_address_variants():
-    assert normalize_wa_address("whatsapp:+916001507395") == "whatsapp:+916001507395"
-    assert normalize_wa_address("+916001507395") == "whatsapp:+916001507395"
-    assert normalize_wa_address("916001507395") == "whatsapp:+916001507395"
+    assert normalize_wa_address("whatsapp:+15555550100") == "whatsapp:+15555550100"
+    assert normalize_wa_address("+15555550100") == "whatsapp:+15555550100"
+    assert normalize_wa_address("15555550100") == "whatsapp:+15555550100"
     assert normalize_wa_address("") is None
     assert normalize_wa_address(None) is None
 
@@ -29,7 +29,7 @@ def test_send_whatsapp_skipped_when_send_disabled(monkeypatch):
     monkeypatch.setenv("TWILIO_ACCOUNT_SID", "ACxxx")
     monkeypatch.setenv("TWILIO_AUTH_TOKEN", "token")
     monkeypatch.setenv("TWILIO_WHATSAPP_SEND", "false")
-    result = send_whatsapp(to="whatsapp:+916001507395", body="hi")
+    result = send_whatsapp(to="whatsapp:+15555550100", body="hi")
     assert result["status"] == "skipped"
     assert "not enabled" in result["error"]
 
@@ -46,7 +46,7 @@ def test_send_whatsapp_success(monkeypatch):
 
     class _Messages:
         def create(self, **kwargs):
-            assert kwargs["to"] == "whatsapp:+916001507395"
+            assert kwargs["to"] == "whatsapp:+15555550100"
             assert kwargs["from_"] == "whatsapp:+14155238886"
             assert kwargs["body"] == "Dogs welcome."
             return _Msg()
@@ -58,7 +58,7 @@ def test_send_whatsapp_success(monkeypatch):
     import twilio.rest as twilio_rest
     monkeypatch.setattr(twilio_rest, "Client", _Client)
 
-    result = send_whatsapp(to="+916001507395", body="Dogs welcome.")
+    result = send_whatsapp(to="+15555550100", body="Dogs welcome.")
     assert result["status"] == "synced"
     assert result["external_id"] == "SM123"
 
@@ -88,7 +88,7 @@ def test_twilio_webhook_rejects_bad_signature(client, monkeypatch):
     )
     resp = client.post(
         "/webhooks/twilio/whatsapp",
-        data={"Body": "hi", "From": "whatsapp:+916001507395", "MessageSid": "SM1"},
+        data={"Body": "hi", "From": "whatsapp:+15555550100", "MessageSid": "SM1"},
         headers={"X-Twilio-Signature": "bad"},
     )
     assert resp.status_code == 403
@@ -106,7 +106,7 @@ def test_twilio_webhook_accepts_and_starts_graph(client, monkeypatch):
         "/webhooks/twilio/whatsapp",
         data={
             "Body": "Can I bring my dog?",
-            "From": "whatsapp:+916001507395",
+            "From": "whatsapp:+15555550100",
             "To": "whatsapp:+14155238886",
             "MessageSid": "SMabc123",
         },
@@ -117,7 +117,7 @@ def test_twilio_webhook_accepts_and_starts_graph(client, monkeypatch):
     assert "<Response></Response>" in resp.text
     assert created["msg"]["channel"] == "whatsapp"
     assert created["msg"]["body"] == "Can I bring my dog?"
-    assert created["msg"]["sender_ref"] == "whatsapp:+916001507395"
+    assert created["msg"]["sender_ref"] == "whatsapp:+15555550100"
     assert created["msg"]["external_ref"] == "SMabc123"
     assert created["msg"]["is_synthetic"] is False
     assert len(main_module._graph.invocations) == before + 1
@@ -130,7 +130,7 @@ def test_twilio_webhook_duplicate_message_sid_returns_empty_twiml(client, monkey
     monkeypatch.setattr(repo, "create_message", lambda **k: created.append(k) or "x")
     resp = client.post(
         "/webhooks/twilio/whatsapp",
-        data={"Body": "hi", "From": "whatsapp:+916001507395", "MessageSid": "SMdup"},
+        data={"Body": "hi", "From": "whatsapp:+15555550100", "MessageSid": "SMdup"},
         headers={"X-Twilio-Signature": "ok"},
     )
     assert resp.status_code == 200

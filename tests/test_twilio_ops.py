@@ -11,7 +11,7 @@ def _base_state(**overrides):
         "run_id": "run-1",
         "decision": "approve",
         "channel": "whatsapp",
-        "sender_ref": "whatsapp:+916001507395",
+        "sender_ref": "whatsapp:+15555550100",
         "intent": "faq",
         "party_size": None,
         "event_date": None,

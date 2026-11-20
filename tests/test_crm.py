@@ -129,9 +129,9 @@ def test_gohighlevel_strips_whatsapp_prefix_from_contact_ref(monkeypatch):
     crm = GoHighLevelCRM()
     crm.create_or_update_lead(
         lead_id="abc-123", intent="faq", party_size=None, event_date=None,
-        contact_ref="whatsapp:+916001507395",
+        contact_ref="whatsapp:+15555550100",
     )
-    assert captured["payload"]["phone"] == "+916001507395"
+    assert captured["payload"]["phone"] == "+15555550100"
     assert "email" not in captured["payload"]
 
 

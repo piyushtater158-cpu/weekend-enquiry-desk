@@ -267,11 +267,11 @@ Optional. When configured, a real WhatsApp sandbox message enters the same LangG
 fixtures; Approve still writes `sent_log`, and with `TWILIO_WHATSAPP_SEND=true` also delivers the
 draft via Twilio and records `channel_deliveries` (same audit shape as `crm_sync`).
 
-1. In Twilio Console → Messaging → Try it out → WhatsApp, join the sandbox from **+91 60015 07395**
+1. In Twilio Console → Messaging → Try it out → WhatsApp, join the sandbox from your own phone
    (`join <your-code>` to `+14155238886`).
 2. Set in `.env`: `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`,
    `TWILIO_WHATSAPP_FROM=whatsapp:+14155238886`,
-   `TWILIO_SANDBOX_DEMO_TO=whatsapp:+916001507395`, `TWILIO_WHATSAPP_SEND=true`,
+   `TWILIO_SANDBOX_DEMO_TO=whatsapp:+<your-number>`, `TWILIO_WHATSAPP_SEND=true`,
    and `PUBLIC_BASE_URL=https://<your-ngrok-host>` (no trailing slash).
 3. Expose the desk: `ngrok http 8001` (or your reverse proxy), then set the sandbox
    “When a message comes in” webhook to `https://<PUBLIC_BASE_URL>/webhooks/twilio/whatsapp`.
